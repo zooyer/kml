@@ -20,4 +20,5 @@
 
 特别说明：使用KeyDown、KeyUp、KeyPress、SimulationPressKey（SayString）接口按字母键时区分大小写，如果小写状态输入大写字母会自动按下Shift键以配合输入，反之亦然。输入上档字符时也会按下Shift键。
 */
-package kml // import "github.com/zooyer/kml"
+
+package kml // Package kml import "github.com/zooyer/kml"

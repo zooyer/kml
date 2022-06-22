@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	// 设备接口
 	procOpenDevice        = kml.NewProc("OpenDevice")
 	procOpenDeviceEx      = kml.NewProc("OpenDeviceEx")
 	procCloseDevice       = kml.NewProc("CloseDevice")
@@ -19,16 +20,7 @@ var (
 	procSetDeviceID       = kml.NewProc("SetDeviceID")
 	procRestoreDeviceID   = kml.NewProc("RestoreDeviceID")
 
-	procGetDeviceTime     = kml.NewProc("GetDeviceTime")
-	procGetLimitMode      = kml.NewProc("GetLimitMode")
-	procSetLimitMode      = kml.NewProc("SetLimitMode")
-	procGetLimitStatus    = kml.NewProc("GetLimitStatus")
-	procGetLimitStartTime = kml.NewProc("GetLimitStartTime")
-	procSetLimitStartTime = kml.NewProc("SetLimitStartTime")
-	procGetLimitStopTime  = kml.NewProc("GetLimitStopTime")
-	procSetLimitStopTime  = kml.NewProc("SetLimitStopTime")
-	procGetRTCStatus      = kml.NewProc("GetRTCStatus")
-
+	// 加密锁接口
 	procInitLock         = kml.NewProc("InitLock")
 	procSetReadPassword  = kml.NewProc("SetReadPassword")
 	procSetWritePassword = kml.NewProc("SetWritePassword")
@@ -38,6 +30,7 @@ var (
 	procEncString        = kml.NewProc("EncString")
 	procDecString        = kml.NewProc("DecString")
 
+	// 键盘接口
 	procKeyDown             = kml.NewProc("KeyDown")
 	procKeyUp               = kml.NewProc("KeyUp")
 	procKeyPress            = kml.NewProc("KeyPress")
@@ -45,11 +38,11 @@ var (
 	procCombinationKeyUp    = kml.NewProc("CombinationKeyUp")
 	procCombinationKeyPress = kml.NewProc("CombinationKeyPress")
 	procSimulationPressKey  = kml.NewProc("SimulationPressKey")
-	procSayString           = kml.NewProc("SayString")
 	procKeyUpAll            = kml.NewProc("KeyUpAll")
 	procGetCapsLock         = kml.NewProc("GetCapsLock")
 	procGetNumLock          = kml.NewProc("GetNumLock")
 
+	// 鼠标接口
 	procLeftDown          = kml.NewProc("LeftDown")
 	procLeftUp            = kml.NewProc("LeftUp")
 	procLeftClick         = kml.NewProc("LeftClick")
@@ -63,18 +56,21 @@ var (
 	procMiddleClick       = kml.NewProc("MiddleClick")
 	procMiddleDoubleClick = kml.NewProc("MiddleDoubleClick")
 	procMouseUpAll        = kml.NewProc("MouseUpAll")
-	procWheelUp           = kml.NewProc("WheelUp")
-	procWheelDown         = kml.NewProc("WheelDown")
-	procMouseWheel        = kml.NewProc("MouseWheel")
 	procSimulationMove    = kml.NewProc("SimulationMove")
 	procMoveTo            = kml.NewProc("MoveTo")
 	procMoveToR           = kml.NewProc("MoveToR")
+	procMoveToFrom        = kml.NewProc("MoveToFrom")
+	procReMoveTo          = kml.NewProc("ReMoveTo")
 
-	procGetKM21Mode = kml.NewProc("GetKM21Mode")
-	procSetKM21Mode = kml.NewProc("SetKM21Mode")
-	procMoveToFrom  = kml.NewProc("MoveToFrom")
-	procReMoveTo    = kml.NewProc("ReMoveTo")
+	// KM21专用接口
+	procGetKM21Mode  = kml.NewProc("GetKM21Mode")
+	procSetKM21Mode  = kml.NewProc("SetKM21Mode")
 
+	// TODO 未找到接口文档，但是DLL中有这两个函数
+	procSetMoveSpeed = kml.NewProc("SetMoveSpeed")
+	procWheelsMove   = kml.NewProc("WheelsMove")
+
+	// TODO 接口文档中辅助函数 改DLL中没有的函数
 	procDelay        = kml.NewProc("Delay")
 	procRandomDelay  = kml.NewProc("RandomDelay")
 	procRunApp       = kml.NewProc("RunApp")
@@ -85,8 +81,6 @@ var (
 	procScreenWidth  = kml.NewProc("ScreenWidth")
 	procNow          = kml.NewProc("Now")
 	procMessageBox   = kml.NewProc("MessageBox")
-
-	procWheelsMove = kml.NewProc("WheelsMove")
 )
 
 func toBool(ret uintptr) bool {
@@ -183,51 +177,6 @@ func restoreDeviceID(pwd string) (ret uintptr, errno syscall.Errno) {
 	return
 }
 
-func getDeviceTime() (ret uintptr, errno syscall.Errno) {
-	ret, _, errno = syscall.Syscall(procGetDeviceTime.Addr(), 0, 0, 0, 0)
-	return
-}
-
-func getLimitMode(pwd string) (ret uintptr, errno syscall.Errno) {
-	ret, _, errno = syscall.Syscall(procGetLimitMode.Addr(), 1, fromString(pwd), 0, 0)
-	return
-}
-
-func setLimitMode(pwd string, mode int) (ret uintptr, errno syscall.Errno) {
-	ret, _, errno = syscall.Syscall(procSetLimitMode.Addr(), 2, fromString(pwd), uintptr(mode), 0)
-	return
-}
-
-func getLimitStatus() (ret uintptr, errno syscall.Errno) {
-	ret, _, errno = syscall.Syscall(procGetLimitStatus.Addr(), 0, 0, 0, 0)
-	return
-}
-
-func getLimitStartTime(pwd string) (ret uintptr, errno syscall.Errno) {
-	ret, _, errno = syscall.Syscall(procGetLimitStartTime.Addr(), 1, fromString(pwd), 0, 0)
-	return
-}
-
-func setLimitStartTime(pwd string, lst string) (ret uintptr, errno syscall.Errno) {
-	ret, _, errno = syscall.Syscall(procSetLimitStartTime.Addr(), 2, fromString(pwd), fromString(lst), 0)
-	return
-}
-
-func getLimitStopTime(pwd string) (ret uintptr, errno syscall.Errno) {
-	ret, _, errno = syscall.Syscall(procGetLimitStopTime.Addr(), 1, fromString(pwd), 0, 0)
-	return
-}
-
-func setLimitStopTime(pwd string, lst string) (ret uintptr, errno syscall.Errno) {
-	ret, _, errno = syscall.Syscall(procSetLimitStopTime.Addr(), 2, fromString(pwd), fromString(lst), 0)
-	return
-}
-
-func getRTCStatus() (ret uintptr, errno syscall.Errno) {
-	ret, _, errno = syscall.Syscall(procGetRTCStatus.Addr(), 0, 0, 0, 0)
-	return
-}
-
 func initLock() (ret uintptr, errno syscall.Errno) {
 	ret, _, errno = syscall.Syscall(procInitLock.Addr(), 0, 0, 0, 0)
 	return
@@ -301,11 +250,6 @@ func combinationKeyPress(key1, key2, key3, key4, key5, key6 string, count int) (
 
 func simulationPressKey(str string) (ret uintptr, errno syscall.Errno) {
 	ret, _, errno = syscall.Syscall(procSimulationPressKey.Addr(), 1, fromString(str), 0, 0)
-	return
-}
-
-func sayString(str string) (ret uintptr, errno syscall.Errno) {
-	ret, _, errno = syscall.Syscall(procSayString.Addr(), 1, fromString(str), 0, 0)
 	return
 }
 
@@ -386,21 +330,6 @@ func middleDoubleClick(count int) (ret uintptr, errno syscall.Errno) {
 
 func mouseUpAll() (ret uintptr, errno syscall.Errno) {
 	ret, _, errno = syscall.Syscall(procMouseUpAll.Addr(), 0, 0, 0, 0)
-	return
-}
-
-func wheelUp(count int8) (ret uintptr, errno syscall.Errno) {
-	ret, _, errno = syscall.Syscall(procWheelUp.Addr(), 1, uintptr(count), 0, 0)
-	return
-}
-
-func wheelDown(count int8) (ret uintptr, errno syscall.Errno) {
-	ret, _, errno = syscall.Syscall(procWheelDown.Addr(), 1, uintptr(count), 0, 0)
-	return
-}
-
-func mouseWheel(count int8) (ret uintptr, errno syscall.Errno) {
-	ret, _, errno = syscall.Syscall(procMouseWheel.Addr(), 1, uintptr(count), 0, 0)
 	return
 }
 
@@ -489,13 +418,13 @@ func messageBox(msg string) (ret uintptr, errno syscall.Errno) {
 	return
 }
 
-// 打开设备
+// OpenDevice 打开设备
 func OpenDevice() bool {
 	ret, _ := openDevice()
 	return toBool(ret)
 }
 
-// 打开指定设备
+// OpenDeviceEx 打开指定设备
 // 入参:
 //     vid: 设备的厂商ID
 //     pid: 产品ID
@@ -504,55 +433,55 @@ func OpenDeviceEx(vid, pid uint16) bool {
 	return toBool(ret)
 }
 
-// 关闭设备
+// CloseDevice 关闭设备
 func CloseDevice() bool {
 	ret, _ := closeDevice()
 	return toBool(ret)
 }
 
-// 检测设备是否连接
+// CheckDevice 检测设备是否连接
 func CheckDevice() bool {
 	ret, _ := checkDevice()
 	return toBool(ret)
 }
 
-// 重启设备
+// Restart 重启设备
 func Restart() bool {
 	ret, _ := restart()
 	return toBool(ret)
 }
 
-// 断开设备延时连接
+// Disconnect 断开设备延时连接
 func Disconnect(second uint8) bool {
 	ret, _ := disconnect(second)
 	return toBool(ret)
 }
 
-// 获取设备系列号
+// GetSN 获取设备系列号
 func GetSN() string {
 	ret, _ := getSN()
 	return toString(ret)
 }
 
-// 获取设备型号
+// GetModel 获取设备型号
 func GetModel() string {
 	ret, _ := getModel()
 	return toString(ret)
 }
 
-// 获取设备版本号
+// GetVersion 获取设备版本号
 func GetVersion() string {
 	ret, _ := getVersion()
 	return toString(ret)
 }
 
-// 获取设备出厂日期
+// GetProductionDate 获取设备出厂日期
 func GetProductionDate() string {
 	ret, _ := getProductionDate()
 	return toString(ret)
 }
 
-// 修改设备ID
+// SetDeviceID 修改设备ID
 // 入参:
 //     pwd: 写密码，该密码由SetWritePassword函数设定
 //     vid: 设备的厂商ID
@@ -566,7 +495,7 @@ func SetDeviceID(pwd string, vid, pid uint16) int {
 	return int(ret)
 }
 
-// 恢复设备出厂ID，InitLock函数也会导致恢复设备ID
+// RestoreDeviceID 恢复设备出厂ID，InitLock函数也会导致恢复设备ID
 // 恢复ID将会在设备重启后生效，可使用Restart重启设备
 // 入参:
 //     pwd: 写密码，该密码由SetWritePassword函数设定
@@ -579,112 +508,16 @@ func RestoreDeviceID(pwd string) int {
 	return int(ret)
 }
 
-// 获取设备RTC时间
-func GetDeviceTime() string {
-	ret, _ := getDeviceTime()
-	return toString(ret)
-}
-
-// 获取时间限制模式，设备支持通过时间来限制设备的使用
-// 入参:
-//     pwd: 读密码，该密码由SetReadPassword函数设定
-// 返回值:
-//     1: 已启用时间限制
-//    其他值: 未启用时间限制
-//     0: 失败
-//    -1: 密码错误
-//    -3: 设备不支持该接口（AP-KM01）
-func GetLimitMode(pwd string) int {
-	ret, _ := getLimitMode(pwd)
-	return int(ret)
-}
-
-// 设置时间限制模式
-// 入参:
-//     pwd: 写密码，该密码由SetWritePassword函数设定
-// 返回值:
-//     1: 成功
-//     0: 失败
-//    -1: 密码错误
-//    -3: 设备不支持该接口（AP-KM01）
-func SetLimitMode(pwd string, model int) int {
-	ret, _ := setLimitMode(pwd, model)
-	return int(ret)
-}
-
-// 获取设备当前是否限制使用
-// 返回值:
-//     1: 已限制使用
-//     2: 已限制使用，RTC异常
-// 其他值: 未限制使用
-//     0: 失败
-//    -3: 设备不支持该接口（AP-KM01）
-func GetLimitStatus() int {
-	ret, _ := getLimitStatus()
-	return int(ret)
-}
-
-// 获取设备设定的开始使用时间，在早于该时间前设备处于限制使用状态
-func GetLimitStartTime(pwd string) string {
-	ret, _ := getLimitStartTime(pwd)
-	return toString(ret)
-}
-
-// 设置设备的启用时间，在早于该时间前设备处于限制使用状态
-// 入参:
-//     pwd: 写密码，该密码由SetWritePassword函数设定
-//     lst: 启用时间，格式为yyyy-mm-dd hh:mm:ss
-// 返回值:
-//     1: 成功
-//     0: 失败
-//    -1: 密码错误
-//    -3: 设备不支持该接口（AP-KM01）
-func SetLimitStartTime(pwd string, lst string) int {
-	ret, _ := setLimitStartTime(pwd, lst)
-	return int(ret)
-}
-
-// 获取设备设定的开始使用时间，在早于该时间前设备处于限制使用状态
-func GetLimitStopTime(pwd string) string {
-	ret, _ := getLimitStopTime(pwd)
-	return toString(ret)
-}
-
-// 设置设备的停用时间，在超过该时间后设备处于限制使用状态
-// 入参:
-//     pwd: 写密码，该密码由SetWritePassword函数设定
-//     lst: 停用时间，格式为yyyy-mm-dd hh:mm:ss
-// 返回值:
-//     1: 成功
-//     0: 失败
-//    -1: 密码错误
-//    -3: 设备不支持该接口（AP-KM01）
-func SetLimitStopTime(pwd string, lst string) int {
-	ret, _ := setLimitStopTime(pwd, lst)
-	return int(ret)
-}
-
-// 获取设备时钟的工作状态，设备有仿破解功能，触发后设备会转为保护状态
-// 返回值:
-//     1: 正常工作
-//     1: 异常锁定状态，该状态时设备主要功能被限制，无法恢复，该状态系外界因素触发了设备的自动保护功能
-//     0: 失败
-//    -3: 设备不支持该接口（AP-KM01）
-func GetRTCStatus() int {
-	ret, _ := getRTCStatus()
-	return int(ret)
-}
-
-// 初始化加密锁，初始化后所有用户存储器内容及配置将丢失，恢复到出厂状态
+// InitLock 初始化加密锁，初始化后所有用户存储器内容及配置将丢失，恢复到出厂状态
 func InitLock() bool {
 	ret, _ := initLock()
 	return toBool(ret)
 }
 
-// 设置读存储器密码，初始密码为空，设置后读存储器将需要该密码，密码长度最大为8字节
+// SetReadPassword 设置读存储器密码，初始密码为空，设置后读存储器将需要该密码，密码长度最大为8个字节
 // 入参:
 //     pwd: 写密码，该密码由SetWritePassword函数设定
-//     new: 新的读密码
+//     new: 新读密码
 // 返回值:
 //     1: 成功
 //     0: 失败
@@ -695,10 +528,10 @@ func SetReadPassword(pwd, new string) int {
 	return int(ret)
 }
 
-// 设置写存储器密码，初始密码为空，，设置后写存储器将需要该密码，密码长度最大为8字节
+// SetWritePassword 设置写存储器密码，初始密码为空，，设置后写存储器将需要该密码，密码长度最大为8个字节
 // 入参:
 //     pwd: 写密码，该密码由SetWritePassword函数设定
-//     new: 新的读密码
+//     new: 新读密码
 // 返回值:
 //     1: 成功
 //     0: 失败
@@ -709,7 +542,7 @@ func SetWritePassword(pwd, new string) int {
 	return int(ret)
 }
 
-// 从存储器读字符串
+// ReadString 从存储器读字符串
 // 入参:
 //     pwd: 读密码，该密码由SetReadPassword函数设定
 //     address: 存储器地址（0-511），共512字节
@@ -719,10 +552,10 @@ func ReadString(pwd string, address, count int) string {
 	return toString(ret)
 }
 
-// 写字符串到存储器，只需指定地址和要写入的字符串，写入长度以字符串长度为准
+// WriteString 写字符串到存储器，只需指定地址和要写入的字符串，写入长度以字符串长度为准
 // 入参:
 //     pwd: 写密码，该密码由SetWritePassword函数设定
-//     address: 存储器地址（0-511），共512字节
+//     address: 存储器地址（0-511），共512个字节
 //     str: 要写入的字符串
 // 返回值:
 //     1: 成功
@@ -735,7 +568,7 @@ func WriteString(pwd string, address int, str string) int {
 	return int(ret)
 }
 
-// 设置算法密钥，用于TEA算法的加密、解密
+// SetStringKey 设置算法密钥，用于TEA算法的加密、解密
 // 入参:
 //     pwd: 写密码，该密码由SetWritePassword函数设定
 //     key: 密钥，最大长度8字节
@@ -749,74 +582,67 @@ func SetStringKey(pwd, key string) int {
 	return int(ret)
 }
 
-// 加密字符串，返回加密后的字符串，待加密的字符串长度最大为8字节，加密后的字符串长度为16字节
+// EncString 加密字符串，返回加密后的字符串，待加密的字符串长度最大为8字节，加密后的字符串长度为16个字节
 func EncString(str string) string {
 	ret, _ := encString(str)
 	return toString(ret)
 }
 
-// 解密字符串，待解密字符串为用EncString函数加密后的串，长度固定为16字节（十六进制）
+// DecString 解密字符串，待解密字符串为用EncString函数加密后的串，长度固定为16字节（十六进制）
 func DecString(str string) string {
 	ret, _ := decString(str)
 	return toString(ret)
 }
 
-// 键盘单个键按下，键码表请参考1.4 USB键盘
+// KeyDown 键盘单个键按下，键码表请参考1.4 USB键盘
 func KeyDown(key string) bool {
 	ret, _ := keyDown(key)
 	return toBool(ret)
 }
 
-// 键盘键弹起，键码表请参考1.4 USB键盘
+// KeyUp 键盘键弹起，键码表请参考1.4 USB键盘
 func KeyUp(key string) bool {
 	ret, _ := keyUp(key)
 	return toBool(ret)
 }
 
-// 键盘单次按键，键码表请参考1.4 USB键盘
+// KeyPress 键盘单次按键，键码表请参考1.4 USB键盘
 func KeyPress(key string, count int) bool {
 	ret, _ := keyPress(key, count)
 	return ret > 0
 }
 
-// 键盘组合键按下
+// CombinationKeyDown 键盘组合键按下
 func CombinationKeyDown(key1, key2, key3, key4, key5, key6 string) bool {
 	ret, _ := combinationKeyDown(key1, key2, key3, key4, key5, key6)
 	return toBool(ret)
 }
 
-// 键盘组合键弹起
+// CombinationKeyUp 键盘组合键弹起
 func CombinationKeyUp(key1, key2, key3, key4, key5, key6 string) bool {
 	ret, _ := combinationKeyUp(key1, key2, key3, key4, key5, key6)
 	return toBool(ret)
 }
 
-// 键盘组合键弹起
+// CombinationKeyPress 键盘组合键弹起
 func CombinationKeyPress(key1, key2, key3, key4, key5, key6 string, count int) bool {
 	ret, _ := combinationKeyPress(key1, key2, key3, key4, key5, key6, count)
 	return ret > 0
 }
 
-// 模拟人工输入字符串
+// SimulationPressKey 模拟人工输入字符串
 func SimulationPressKey(keys string) bool {
 	ret, _ := simulationPressKey(keys)
 	return ret > 0
 }
 
-// 模拟人工输入字符串
-// 在幽灵键鼠集成开发环境里支持使用别名SayString
-func SayString(keys string) bool {
-	ret, _ := sayString(keys)
-	return ret > 0
-}
-
-// 所有键盘按键弹起，在复杂的代码中容易忘记哪些键已经按下，该函数可将所有按键都弹起
+// KeyUpAll 所有键盘按键弹起，在复杂的代码中容易忘记哪些键已经按下，该函数可将所有按键都弹起
 func KeyUpAll() bool {
 	ret, _ := keyUpAll()
 	return toBool(ret)
 }
 
-// 获取键盘大定灯状态
+// GetCapsLock 获取键盘大定灯状态
 // 返回值:
 //     1: CapsLock灯熄灭
 //     2: CapsLock灯亮
@@ -826,7 +652,7 @@ func GetCapsLock() int {
 	return int(ret)
 }
 
-// 获取小键盘灯状态
+// GetNumLock 获取小键盘灯状态
 // 返回值:
 //     1: NumLock灯熄灭
 //     2: NumLock灯亮
@@ -836,122 +662,104 @@ func GetNumLock() int {
 	return int(ret)
 }
 
-// 鼠标左键按下
+// LeftDown 鼠标左键按下
 func LeftDown() bool {
 	ret, _ := leftDown()
 	return toBool(ret)
 }
 
-// 鼠标左键弹起
+// LeftUp 鼠标左键弹起
 func LeftUp() bool {
 	ret, _ := leftUp()
 	return toBool(ret)
 }
 
-// 鼠标左键单击
+// LeftClick 鼠标左键单击
 func LeftClick(count int) bool {
 	ret, _ := leftClick(count)
 	return ret > 0
 }
 
-// 鼠标左键双击
+// LeftDoubleClick 鼠标左键双击
 func LeftDoubleClick(count int) bool {
 	ret, _ := leftDoubleClick(count)
 	return ret > 0
 }
 
-// 鼠标右键按下
+// RightDown 鼠标右键按下
 func RightDown() bool {
 	ret, _ := rightDown()
 	return toBool(ret)
 }
 
-// 鼠标右键弹起
+// RightUp 鼠标右键弹起
 func RightUp() bool {
 	ret, _ := rightUp()
 	return toBool(ret)
 }
 
-// 鼠标右键单击
+// RightClick 鼠标右键单击
 func RightClick(count int) bool {
 	ret, _ := rightClick(count)
 	return ret > 0
 }
 
-// 鼠标右键双击
+// RightDoubleClick 鼠标右键双击
 func RightDoubleClick(count int) bool {
 	ret, _ := rightDoubleClick(count)
 	return ret > 0
 }
 
-// 鼠标中键按下
+// MiddleDown 鼠标中键按下
 func MiddleDown() bool {
 	ret, _ := middleDown()
 	return toBool(ret)
 }
 
-// 鼠标中键弹起
+// MiddleUp 鼠标中键弹起
 func MiddleUp() bool {
 	ret, _ := middleUp()
 	return toBool(ret)
 }
 
-// 鼠标中键单击
+// MiddleClick 鼠标中键单击
 func MiddleClick(count int) bool {
 	ret, _ := middleClick(count)
 	return ret > 0
 }
 
-// 鼠标中键双击
+// MiddleDoubleClick 鼠标中键双击
 func MiddleDoubleClick(count int) bool {
 	ret, _ := middleDoubleClick(count)
 	return ret > 0
 }
 
-// 所有鼠标按键弹起
+// MouseUpAll 所有鼠标按键弹起
 func MouseUpAll() bool {
 	ret, _ := mouseUpAll()
 	return toBool(ret)
 }
 
-// 鼠标滚轮上翻
-func WheelUp(count int8) bool {
-	ret, _ := wheelUp(count)
-	return toBool(ret)
-}
-
-// 鼠标滚轮下翻
-func WheelDown(count int8) bool {
-	ret, _ := wheelDown(count)
-	return toBool(ret)
-}
-
-// 鼠标滚轮移动，通过参数可支持上下移动，是WheelDown+ WheelUp的组合形式
-func MouseWheel(count int8) bool {
-	ret, _ := mouseWheel(count)
-	return toBool(ret)
-}
-
-// 模拟人工移动鼠标
+// SimulationMove 模拟人工移动鼠标
 func SimulationMove(x, y int) bool {
 	ret, _ := simulationMove(x, y)
 	return ret > 0
 }
 
-// 模拟人工移动鼠标
+// MoveTo 模拟人工移动鼠标
 // 在幽灵键鼠集成开发环境里支持使用别名MoveTo
 func MoveTo(x, y int) bool {
 	ret, _ := moveTo(x, y)
 	return ret > 0
 }
 
-// 相对移动鼠标
+// MoveToR 相对移动鼠标
 func MoveToR(x, y int8) bool {
 	ret, _ := moveToR(x, y)
 	return ret > 0
 }
 
-// 获取KM21工作模式，KM21出厂时默认单头模式
+// GetKM21Mode 获取KM21工作模式，KM21出厂时默认单头模式
 // 返回值:
 //     1: 单头模式
 //     0: 双头模式
@@ -961,7 +769,7 @@ func GetKM21Mode() int {
 	return int(ret)
 }
 
-// 设置KM21工作模式
+// SetKM21Mode 设置KM21工作模式
 // 入参:
 //     model: 工作模式，1表示单头，0表示双头
 func SetKM21Mode(model int) bool {
@@ -969,7 +777,7 @@ func SetKM21Mode(model int) bool {
 	return toBool(ret)
 }
 
-// 移动鼠标（指定鼠标坐标）
+// MoveToFrom 移动鼠标（指定鼠标坐标）
 // 入参:
 //     fx, fy : 受控端鼠标的当前坐标
 //     tx, ty : 要移到的目标坐标
@@ -978,7 +786,7 @@ func MoveToFrom(fx, fy, tx, ty int) bool {
 	return ret > 0
 }
 
-// 复位移动鼠标
+// ReMoveTo 复位移动鼠标
 // 入参:
 //     x, y : 要移到的目标坐标
 func ReMoveTo(x, y int) bool {
@@ -986,14 +794,14 @@ func ReMoveTo(x, y int) bool {
 	return ret > 0
 }
 
-// 延时等待
+// Delay 延时等待
 // 入参:
 //     ms: 延时的毫秒数（1秒=1000毫秒）
 func Delay(ms int) {
 	_, _ = delay(ms)
 }
 
-// 随机延时
+// RandomDelay 随机延时
 // 入参:
 //     min: 延时的最小时间，单位：毫秒
 //     max: 延时的最大时间，单位：毫秒
@@ -1004,7 +812,7 @@ func RandomDelay(min, max int) int {
 	return int(ret)
 }
 
-// 运行指定的程序
+// RunApp 运行指定的程序
 // 入参:
 //     filepath: 要运行的程序路径和名称
 // 返回值:
@@ -1018,7 +826,7 @@ func RunApp(filepath string) int {
 	return int(ret)
 }
 
-// 获取鼠标当前位置
+// GetCursorPos 获取鼠标当前位置
 // 入参:
 //     x: 返回鼠标的水平坐标
 //     y: 返回鼠标的垂直坐标
@@ -1027,37 +835,37 @@ func GetCursorPos(x, y *int) bool {
 	return toBool(ret)
 }
 
-// 获取鼠标水平坐标
+// MouseX 获取鼠标水平坐标
 func MouseX() int {
 	ret, _ := mouseX()
 	return int(ret)
 }
 
-// 获取鼠标垂直坐标
+// MouseY 获取鼠标垂直坐标
 func MouseY() int {
 	ret, _ := mouseY()
 	return int(ret)
 }
 
-// 获取屏幕高度
+// ScreenHeight 获取屏幕高度
 func ScreenHeight() int {
 	ret, _ := screenHeight()
 	return int(ret)
 }
 
-// 获取屏幕宽度
+// ScreenWidth 获取屏幕宽度
 func ScreenWidth() int {
 	ret, _ := screenWidth()
 	return int(ret)
 }
 
-// 获取系统时间
+// Now 获取系统时间
 func Now() string {
 	ret, _ := now()
 	return toString(ret)
 }
 
-// 消息对话框
+// MessageBox 消息对话框
 func MessageBox(msg string) bool {
 	ret, _ := messageBox(msg)
 	return toBool(ret)
