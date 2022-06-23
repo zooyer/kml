@@ -2,6 +2,7 @@ package kml
 
 import (
 	_ "embed"
+	"io/ioutil"
 	"syscall"
 )
 
