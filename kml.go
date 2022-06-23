@@ -5,6 +5,8 @@ import (
 	"unsafe"
 )
 
+var dll []byte
+
 var (
 	// 设备接口
 	procOpenDevice        = kml.NewProc("OpenDevice")
