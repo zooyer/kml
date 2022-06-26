@@ -6,13 +6,17 @@ import (
 	"syscall"
 )
 
-var kml = syscall.NewLazyDLL("kml64.dll")
+const (
+	name = "kml64.dll"
+)
+
+var kml = syscall.NewLazyDLL(name)
 
 //go:embed kml64.dll
 var lib []byte
 
 func init() {
-	if err := ioutil.WriteFile("./kml32.dll", lib, 0644); err != nil {
+	if err := ioutil.WriteFile(name, lib, 0644); err != nil {
 		panic(err)
 	}
 }
